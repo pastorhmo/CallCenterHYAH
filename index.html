@@ -1,0 +1,1470 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CallCenter HYAH</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style id="app-style">
+    :root {
+      --bg-primary: #0f172a;
+      --bg-secondary: #1e293b;
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --accent-primary: #06b6d4;
+      --accent-secondary: #0ea5e9;
+      --accent-tertiary: #3b82f6;
+      --card-bg: #1e293b;
+      --card-border: #334155;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --glow: 0 0 10px var(--accent-primary), 0 0 20px var(--accent-primary);
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+    }
+
+    .orbitron {
+      font-family: 'Orbitron', sans-serif;
+    }
+
+    .neon-text {
+      color: var(--accent-primary);
+      text-shadow: 0 0 5px var(--accent-primary);
+    }
+
+    .neon-border {
+      border: 1px solid var(--accent-primary);
+      box-shadow: 0 0 5px var(--accent-primary);
+    }
+
+    .neon-button {
+      background: linear-gradient(45deg, var(--accent-primary), var(--accent-tertiary));
+      border: none;
+      color: var(--text-primary);
+      padding: 0.5rem 1rem;
+      border-radius: 0.375rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .neon-button:hover {
+      box-shadow: var(--glow);
+      transform: translateY(-2px);
+    }
+
+    .neon-button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: 0.5s;
+    }
+
+    .neon-button:hover::before {
+      left: 100%;
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 0.5rem;
+      padding: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .card:hover {
+      box-shadow: 0 0 15px rgba(6, 182, 212, 0.3);
+      transform: translateY(-5px);
+    }
+
+    .login-container {
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95));
+      border-radius: 1rem;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(10px);
+    }
+
+    .kanban-column {
+      background-color: var(--bg-secondary);
+      border-radius: 0.5rem;
+      min-height: 500px;
+      max-height: calc(100vh - 220px);
+      overflow-y: auto;
+    }
+
+    .kanban-column::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .kanban-column::-webkit-scrollbar-thumb {
+      background-color: var(--accent-primary);
+      border-radius: 3px;
+    }
+
+    .column-header {
+      background: linear-gradient(90deg, var(--bg-secondary), var(--card-bg));
+      border-bottom: 2px solid var(--accent-primary);
+    }
+
+    .call-card {
+      cursor: grab;
+      background: var(--card-bg);
+      border-left: 3px solid var(--accent-primary);
+    }
+
+    .call-card.dragging {
+      opacity: 0.5;
+      box-shadow: var(--glow);
+    }
+
+    .ghost-card {
+      background: rgba(6, 182, 212, 0.1);
+      border: 2px dashed var(--accent-primary);
+    }
+
+    .modal-backdrop {
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(5px);
+    }
+
+    .modal-content {
+      background: linear-gradient(135deg, var(--bg-secondary), var(--bg-primary));
+      border: 1px solid var(--card-border);
+      border-radius: 1rem;
+    }
+
+    input, textarea, select {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      border: 1px solid var(--card-border);
+      border-radius: 0.375rem;
+      padding: 0.5rem;
+      transition: all 0.3s ease;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.2);
+    }
+
+    .status-badge {
+      font-size: 0.75rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 9999px;
+    }
+
+    .status-pending {
+      background-color: var(--warning);
+      color: #000;
+    }
+
+    .status-progress {
+      background-color: var(--accent-tertiary);
+      color: #fff;
+    }
+
+    .status-completed {
+      background-color: var(--success);
+      color: #fff;
+    }
+
+    .pulse {
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.7);
+      }
+      70% {
+        box-shadow: 0 0 0 10px rgba(6, 182, 212, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(6, 182, 212, 0);
+      }
+    }
+
+    .loader {
+      width: 48px;
+      height: 48px;
+      border: 3px solid var(--accent-primary);
+      border-radius: 50%;
+      display: inline-block;
+      position: relative;
+      box-sizing: border-box;
+      animation: rotation 1s linear infinite;
+    }
+    
+    .loader::after {
+      content: '';  
+      box-sizing: border-box;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 3px solid;
+      border-color: var(--accent-tertiary) transparent;
+    }
+    
+    @keyframes rotation {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen">
+  <!-- Auth Container -->
+  <div id="auth-container" class="min-h-screen flex items-center justify-center p-4">
+    <div class="login-container w-full max-w-md p-8 animate__animated animate__fadeIn">
+      <div class="text-center mb-8">
+        <h1 class="orbitron text-3xl font-bold neon-text mb-2">CallCenter HYAH</h1>
+        <p class="text-sm text-gray-400">Sistema de gestión de llamadas</p>
+      </div>
+      
+      <!-- Login Form -->
+      <form id="login-form" class="space-y-6">
+        <div class="text-center mb-4">
+          <h2 class="text-xl font-semibold">Iniciar Sesión</h2>
+        </div>
+        <div>
+          <label for="login-email" class="block text-sm font-medium text-gray-400 mb-1">Correo electrónico</label>
+          <input type="email" id="login-email" name="email" required class="w-full">
+        </div>
+        <div>
+          <label for="login-password" class="block text-sm font-medium text-gray-400 mb-1">Contraseña</label>
+          <input type="password" id="login-password" name="password" required class="w-full">
+        </div>
+        <div id="login-error" class="text-danger text-sm hidden"></div>
+        <button type="submit" class="neon-button w-full">
+          Iniciar Sesión
+        </button>
+        <div class="text-center text-sm">
+          <span class="text-gray-400">¿No tienes cuenta?</span>
+          <a href="javascript:void(0)" id="show-register" class="ml-1 text-accent-primary hover:underline">Registrarse</a>
+        </div>
+      </form>
+      
+      <!-- Register Form (Hidden by default) -->
+      <form id="register-form" class="space-y-6 hidden">
+        <div class="text-center mb-4">
+          <h2 class="text-xl font-semibold">Crear Cuenta</h2>
+        </div>
+        <div>
+          <label for="register-name" class="block text-sm font-medium text-gray-400 mb-1">Nombre completo</label>
+          <input type="text" id="register-name" name="name" required class="w-full">
+        </div>
+        <div>
+          <label for="register-email" class="block text-sm font-medium text-gray-400 mb-1">Correo electrónico</label>
+          <input type="email" id="register-email" name="email" required class="w-full">
+        </div>
+        <div>
+          <label for="register-password" class="block text-sm font-medium text-gray-400 mb-1">Contraseña</label>
+          <input type="password" id="register-password" name="password" required class="w-full">
+        </div>
+        <div>
+          <label for="register-confirm" class="block text-sm font-medium text-gray-400 mb-1">Confirmar contraseña</label>
+          <input type="password" id="register-confirm" name="confirm" required class="w-full">
+        </div>
+        <div id="register-error" class="text-danger text-sm hidden"></div>
+        <button type="submit" class="neon-button w-full">
+          Registrarse
+        </button>
+        <div class="text-center text-sm">
+          <span class="text-gray-400">¿Ya tienes cuenta?</span>
+          <a href="javascript:void(0)" id="show-login" class="ml-1 text-accent-primary hover:underline">Iniciar Sesión</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Main App Container (Hidden by default) -->
+  <div id="app-container" class="hidden min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-bg-secondary to-bg-primary py-3 px-4 shadow-lg">
+      <div class="container mx-auto flex flex-wrap items-center justify-between">
+        <div class="flex items-center space-x-2">
+          <h1 class="orbitron text-2xl md:text-3xl font-bold neon-text">CallFlow</h1>
+        </div>
+        <div class="flex items-center mt-2 sm:mt-0">
+          <div class="mr-4">
+            <span class="text-sm text-gray-400">Hola,</span>
+            <span id="user-name" class="ml-1 font-medium"></span>
+          </div>
+          <button id="logout-btn" class="flex items-center text-sm px-3 py-1 border border-accent-primary rounded-md hover:bg-accent-primary hover:bg-opacity-20 transition-colors">
+            <i class="fas fa-sign-out-alt mr-1"></i> Salir
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Search and Filter Bar -->
+    <div class="bg-bg-secondary py-4 px-4 border-b border-card-border">
+      <div class="container mx-auto flex flex-wrap items-center justify-between gap-4">
+        <div class="flex-grow max-w-md">
+          <div class="relative">
+            <input type="search" id="search-calls" placeholder="Buscar llamadas..." class="w-full pl-10 pr-4 py-2 rounded-lg">
+            <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <select id="filter-status" class="text-sm rounded-lg">
+            <option value="all">Todos los estados</option>
+            <option value="pending">Pendientes</option>
+            <option value="progress">En Progreso</option>
+            <option value="completed">Completadas</option>
+          </select>
+          <button id="add-call-btn" class="neon-button flex items-center">
+            <i class="fas fa-plus mr-2"></i> Nueva Llamada
+          </button>
+          <!-- Aqui se agrego esto -->
+          <div class="relative" id="data-actions-container">
+            <button id="data-actions-btn" class="neon-button flex items-center">
+              <i class="fas fa-database mr-2"></i> Datos
+            </button>
+            <div class="absolute right-0 mt-1 w-48 bg-bg-secondary rounded-md shadow-lg z-10 hidden" id="data-actions-menu">
+              <button id="export-json-btn" class="w-full text-left px-4 py-2 text-sm hover:bg-bg-primary">
+                <i class="fas fa-file-export mr-2"></i> Exportar JSON
+              </button>
+              <button id="export-csv-btn" class="w-full text-left px-4 py-2 text-sm hover:bg-bg-primary">
+                <i class="fas fa-file-csv mr-2"></i> Exportar CSV
+              </button>
+              <button id="import-json-btn" class="w-full text-left px-4 py-2 text-sm hover:bg-bg-primary">
+                <i class="fas fa-file-import mr-2"></i> Importar JSON
+              </button>
+              <input type="file" id="import-json-file" class="hidden" accept=".json">
+            </div>
+          </div>
+          <!--<div class="relative group">
+            <button id="data-actions-btn" class="neon-button flex items-center">
+              <i class="fas fa-database mr-2"></i> Datos
+            </button>
+            <div class="absolute right-0 mt-1 w-48 bg-bg-secondary rounded-md shadow-lg z-10 hidden group-hover:block">
+              <button id="export-json-btn" class="w-full text-left px-4 py-2 text-sm hover:bg-bg-primary">
+                <i class="fas fa-file-export mr-2"></i> Exportar JSON
+              </button>
+              <button id="export-csv-btn" class="w-full text-left px-4 py-2 text-sm hover:bg-bg-primary">
+                <i class="fas fa-file-csv mr-2"></i> Exportar CSV
+              </button>
+              <button id="import-json-btn" class="w-full text-left px-4 py-2 text-sm hover:bg-bg-primary">
+                <i class="fas fa-file-import mr-2"></i> Importar JSON
+              </button>
+              <input type="file" id="import-json-file" class="hidden" accept=".json">
+            </div>
+          </div> -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+<main class="flex-grow p-4">
+  <div class="container mx-auto">
+    <!-- Stats Section -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div class="card p-4 text-center">
+        <h3 class="text-gray-400 mb-2">Total Llamadas</h3>
+        <div class="text-3xl font-bold" id="total-calls">0</div>
+      </div>
+      <div class="card p-4 text-center">
+        <h3 class="text-gray-400 mb-2">Completadas (7 días)</h3>
+        <div class="text-3xl font-bold text-success" id="weekly-completed">0</div>
+      </div>
+      <div class="card p-4 text-center">
+        <h3 class="text-gray-400 mb-2">Próximas (7 días)</h3>
+        <div class="text-3xl font-bold text-warning" id="upcoming-calls">0</div>
+      </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      <div class="card p-4">
+        <h3 class="text-center mb-4">Llamadas por Estado</h3>
+        <canvas id="status-chart" height="250"></canvas>
+      </div>
+      <div class="card p-4">
+        <h3 class="text-center mb-4">Llamadas por Fecha</h3>
+        <canvas id="timeline-chart" height="250"></canvas>
+      </div>
+    </div>
+
+    <!-- Kanban Board -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Pending Calls Column -->
+          <div class="kanban-column" data-status="pending">
+            <div class="column-header px-4 py-3 flex justify-between items-center">
+              <h3 class="font-semibold text-lg flex items-center">
+                <i class="fas fa-clock mr-2 text-warning"></i>
+                Pendientes
+                <span id="pending-count" class="ml-2 text-xs px-2 py-1 bg-warning text-black rounded-full">0</span>
+              </h3>
+            </div>
+            <div class="calls-container p-3 space-y-3" id="pending-calls">
+              <!-- Call cards will be added dynamically here -->
+            </div>
+          </div>
+          
+          <!-- In Progress Calls Column -->
+          <div class="kanban-column" data-status="progress">
+            <div class="column-header px-4 py-3 flex justify-between items-center">
+              <h3 class="font-semibold text-lg flex items-center">
+                <i class="fas fa-phone-volume mr-2 text-accent-tertiary"></i>
+                En Progreso
+                <span id="progress-count" class="ml-2 text-xs px-2 py-1 bg-accent-tertiary text-white rounded-full">0</span>
+              </h3>
+            </div>
+            <div class="calls-container p-3 space-y-3" id="progress-calls">
+              <!-- Call cards will be added dynamically here -->
+            </div>
+          </div>
+          
+          <!-- Completed Calls Column -->
+          <div class="kanban-column" data-status="completed">
+            <div class="column-header px-4 py-3 flex justify-between items-center">
+              <h3 class="font-semibold text-lg flex items-center">
+                <i class="fas fa-check-circle mr-2 text-success"></i>
+                Completadas
+                <span id="completed-count" class="ml-2 text-xs px-2 py-1 bg-success text-white rounded-full">0</span>
+              </h3>
+            </div>
+            <div class="calls-container p-3 space-y-3" id="completed-calls">
+              <!-- Call cards will be added dynamically here -->
+            </div>
+          </div>
+    </div>
+  </div>
+</main>
+  </div>
+
+  <!-- Add/Edit Call Modal -->
+  <div id="call-modal" class="fixed inset-0 modal-backdrop hidden flex items-center justify-center z-50 p-4">
+    <div class="modal-content w-full max-w-md animate__animated animate__fadeInDown">
+      <div class="p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h3 id="modal-title" class="text-xl font-bold orbitron">Nueva Llamada</h3>
+          <button id="close-modal" class="text-gray-400 hover:text-white">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        
+        <form id="call-form" class="space-y-4">
+          <input type="hidden" id="call-id">
+          <div>
+            <label for="call-name" class="block text-sm font-medium text-gray-400 mb-1">Nombre a quien Llamas</label>
+            <input type="text" id="call-name" required class="w-full">
+          </div>
+          
+          <div>
+            <label for="call-date" class="block text-sm font-medium text-gray-400 mb-1">Fecha de Llamada</label>
+            <input type="datetime-local" id="call-date" required class="w-full">
+          </div>
+          
+          <div>
+            <label for="call-status" class="block text-sm font-medium text-gray-400 mb-1">Estado</label>
+            <select id="call-status" class="w-full">
+              <option value="pending">Pendiente</option>
+              <option value="progress">En Progreso</option>
+              <option value="completed">Completada</option>
+            </select>
+          </div>
+          
+          <div>
+            <label for="call-followup" class="block text-sm font-medium text-gray-400 mb-1">Seguimiento</label>
+            <textarea id="call-followup" rows="2" class="w-full"></textarea>
+          </div>
+          
+          <div>
+            <label for="call-notes" class="block text-sm font-medium text-gray-400 mb-1">Notas</label>
+            <textarea id="call-notes" rows="3" class="w-full"></textarea>
+          </div>
+          
+          <div>
+            <label class="flex items-center">
+              <input type="checkbox" id="set-reminder" class="mr-2">
+              <span class="text-sm text-gray-400">Establecer recordatorio</span>
+            </label>
+            <div id="reminder-container" class="mt-2 hidden">
+              <input type="datetime-local" id="reminder-date" class="w-full">
+            </div>
+          </div>
+          
+          <div class="flex justify-end space-x-3 mt-6">
+            <button type="button" id="delete-call" class="px-4 py-2 bg-danger bg-opacity-20 text-danger border border-danger rounded-md hover:bg-opacity-30 hidden">
+              <i class="fas fa-trash-alt mr-1"></i> Eliminar
+            </button>
+            <button type="submit" class="neon-button">
+              <span id="save-text">Guardar</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- View Call Details Modal -->
+  <div id="view-modal" class="fixed inset-0 modal-backdrop hidden flex items-center justify-center z-50 p-4">
+    <div class="modal-content w-full max-w-md animate__animated animate__fadeInDown">
+      <div class="p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-xl font-bold orbitron">Detalles de la Llamada</h3>
+          <button id="close-view-modal" class="text-gray-400 hover:text-white">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        
+        <div class="space-y-4">
+          <div>
+            <h4 id="view-name" class="text-xl font-semibold"></h4>
+            <div class="flex items-center mt-1">
+              <span id="view-status-badge" class="status-badge mr-2"></span>
+              <span id="view-date" class="text-sm text-gray-400"></span>
+            </div>
+          </div>
+          
+          <div class="border-t border-card-border pt-4">
+            <h5 class="text-sm text-gray-400 mb-1">Seguimiento</h5>
+            <p id="view-followup" class="text-sm"></p>
+          </div>
+          
+          <div class="border-t border-card-border pt-4">
+            <h5 class="text-sm text-gray-400 mb-1">Notas</h5>
+            <p id="view-notes" class="text-sm"></p>
+          </div>
+          
+          <div id="view-reminder" class="border-t border-card-border pt-4 hidden">
+            <div class="flex items-center">
+              <i class="fas fa-bell text-accent-primary mr-2"></i>
+              <h5 class="text-sm">Recordatorio: <span id="view-reminder-date"></span></h5>
+            </div>
+          </div>
+          
+          <div class="flex justify-end space-x-3 mt-6">
+            <button id="edit-call" class="px-4 py-2 border border-accent-primary rounded-md hover:bg-accent-primary hover:bg-opacity-20">
+              <i class="fas fa-edit mr-1"></i> Editar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Loading Overlay -->
+  <div id="loading-overlay" class="fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center hidden">
+    <div class="text-center">
+      <span class="loader"></span>
+      <p class="mt-4 text-accent-primary">Cargando...</p>
+    </div>
+  </div>
+
+  <script id="app-script">
+    document.addEventListener('DOMContentLoaded', function() {
+      // DOM Elements - Auth
+      const authContainer = document.getElementById('auth-container');
+      const loginForm = document.getElementById('login-form');
+      const registerForm = document.getElementById('register-form');
+      const showRegisterLink = document.getElementById('show-register');
+      const showLoginLink = document.getElementById('show-login');
+      const loginError = document.getElementById('login-error');
+      const registerError = document.getElementById('register-error');
+      
+      // DOM Elements - App
+      const appContainer = document.getElementById('app-container');
+      const userName = document.getElementById('user-name');
+      const logoutBtn = document.getElementById('logout-btn');
+      const searchInput = document.getElementById('search-calls');
+      const filterStatus = document.getElementById('filter-status');
+      const addCallBtn = document.getElementById('add-call-btn');
+      
+      // DOM Elements - Modal
+      const callModal = document.getElementById('call-modal');
+      const modalTitle = document.getElementById('modal-title');
+      const callForm = document.getElementById('call-form');
+      const closeModalBtn = document.getElementById('close-modal');
+      const callIdInput = document.getElementById('call-id');
+      const callNameInput = document.getElementById('call-name');
+      const callDateInput = document.getElementById('call-date');
+      const callStatusInput = document.getElementById('call-status');
+      const callFollowupInput = document.getElementById('call-followup');
+      const callNotesInput = document.getElementById('call-notes');
+      const setReminderCheckbox = document.getElementById('set-reminder');
+      const reminderContainer = document.getElementById('reminder-container');
+      const reminderDateInput = document.getElementById('reminder-date');
+      const deleteCallBtn = document.getElementById('delete-call');
+      const saveText = document.getElementById('save-text');
+      
+      // DOM Elements - View Modal
+      const viewModal = document.getElementById('view-modal');
+      const closeViewModalBtn = document.getElementById('close-view-modal');
+      const viewName = document.getElementById('view-name');
+      const viewStatusBadge = document.getElementById('view-status-badge');
+      const viewDate = document.getElementById('view-date');
+      const viewFollowup = document.getElementById('view-followup');
+      const viewNotes = document.getElementById('view-notes');
+      const viewReminder = document.getElementById('view-reminder');
+      const viewReminderDate = document.getElementById('view-reminder-date');
+      const editCallBtn = document.getElementById('edit-call');
+      
+      // DOM Elements - Columns
+      const pendingCallsContainer = document.getElementById('pending-calls');
+      const progressCallsContainer = document.getElementById('progress-calls');
+      const completedCallsContainer = document.getElementById('completed-calls');
+      const pendingCount = document.getElementById('pending-count');
+      const progressCount = document.getElementById('progress-count');
+      const completedCount = document.getElementById('completed-count');
+      
+      // Loading overlay
+      const loadingOverlay = document.getElementById('loading-overlay');
+      
+      // State
+      let currentUser = null;
+      let calls = [];
+      let editingCallId = null;
+      let sortables = [];
+      //-----se qgrego esto ----------
+      let statusChart = null;
+      let timelineChart = null;
+      //------------------------------
+
+      // Initialize the application
+      init();
+
+      // Set current date and time as default for new calls
+      const now = new Date();
+      const localDatetime = now.toISOString().slice(0, 16);
+      callDateInput.value = localDatetime;
+      
+      // Show register form
+      showRegisterLink.addEventListener('click', function() {
+        loginForm.classList.add('hidden');
+        registerForm.classList.remove('hidden');
+        loginError.classList.add('hidden');
+      });
+      
+      // Show login form
+      showLoginLink.addEventListener('click', function() {
+        registerForm.classList.add('hidden');
+        loginForm.classList.remove('hidden');
+        registerError.classList.add('hidden');
+      });
+      
+      // Login form submit
+      loginForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+        
+        if (!email || !password) {
+          showError(loginError, 'Por favor, completa todos los campos');
+          return;
+        }
+        
+        showLoading();
+        
+        // Check if user exists in localStorage
+        const users = JSON.parse(localStorage.getItem('callflow_users') || '[]');
+        const user = users.find(u => u.email === email && u.password === password);
+        
+        if (user) {
+          // Set current user in localStorage
+          localStorage.setItem('callflow_current_user', JSON.stringify(user));
+          currentUser = user;
+          
+          // Hide auth container and show app container
+          setTimeout(() => {
+            hideLoading();
+            authContainer.classList.add('hidden');
+            appContainer.classList.remove('hidden');
+            
+            // Update UI with user info
+            userName.textContent = user.name;
+            
+            // Load calls for the current user
+            loadCalls();
+            
+            // Initialize Sortable.js for kanban columns
+            initSortable();
+          }, 1000);
+        } else {
+          hideLoading();
+          showError(loginError, 'Credenciales incorrectas');
+        }
+      });
+      
+      // Register form submit
+      registerForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const name = document.getElementById('register-name').value;
+        const email = document.getElementById('register-email').value;
+        const password = document.getElementById('register-password').value;
+        const confirm = document.getElementById('register-confirm').value;
+        
+        if (!name || !email || !password || !confirm) {
+          showError(registerError, 'Por favor, completa todos los campos');
+          return;
+        }
+        
+        if (password !== confirm) {
+          showError(registerError, 'Las contraseñas no coinciden');
+          return;
+        }
+        
+        showLoading();
+        
+        // Get existing users from localStorage
+        const users = JSON.parse(localStorage.getItem('callflow_users') || '[]');
+        
+        // Check if email already exists
+        if (users.some(u => u.email === email)) {
+          hideLoading();
+          showError(registerError, 'Este correo electrónico ya está registrado');
+          return;
+        }
+        
+        // Create new user
+        const newUser = {
+          id: generateUniqueId(),
+          name,
+          email,
+          password
+        };
+        
+        // Add user to the array and save to localStorage
+        users.push(newUser);
+        localStorage.setItem('callflow_users', JSON.stringify(users));
+        
+        // Set current user
+        localStorage.setItem('callflow_current_user', JSON.stringify(newUser));
+        currentUser = newUser;
+        
+        // Hide auth container and show app container
+        setTimeout(() => {
+          hideLoading();
+          authContainer.classList.add('hidden');
+          appContainer.classList.remove('hidden');
+          
+          // Update UI with user info
+          userName.textContent = newUser.name;
+          
+          // Initialize empty calls array for new user
+          calls = [];
+          saveCalls();
+          
+          // Initialize Sortable.js for kanban columns
+          initSortable();
+        }, 1000);
+      });
+      
+      // Logout button click
+      logoutBtn.addEventListener('click', function() {
+        localStorage.removeItem('callflow_current_user');
+        location.reload();
+      });
+      
+      // Add call button click
+      addCallBtn.addEventListener('click', function() {
+        openModal();
+      });
+      
+      // Close modal button click
+      closeModalBtn.addEventListener('click', function() {
+        closeModal();
+      });
+      
+      // Close view modal button click
+      closeViewModalBtn.addEventListener('click', function() {
+        closeViewModal();
+      });
+      
+      // Set reminder checkbox change
+      setReminderCheckbox.addEventListener('change', function() {
+        reminderContainer.classList.toggle('hidden', !this.checked);
+        
+        if (this.checked && !reminderDateInput.value) {
+          reminderDateInput.value = callDateInput.value;
+        }
+      });
+      
+      // Delete call button click
+      deleteCallBtn.addEventListener('click', function() {
+        if (confirm('¿Estás seguro de que deseas eliminar esta llamada?')) {
+          deleteCall(editingCallId);
+          closeModal();
+        }
+      });
+      
+      // Edit call button click
+      editCallBtn.addEventListener('click', function() {
+        closeViewModal();
+        const callId = editCallBtn.dataset.callId;
+        openModal(callId);
+      });
+      
+      // Call form submit
+      callForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const callData = {
+          id: callIdInput.value || generateUniqueId(),
+          name: callNameInput.value,
+          date: callDateInput.value,
+          status: callStatusInput.value,
+          followup: callFollowupInput.value,
+          notes: callNotesInput.value,
+          reminder: setReminderCheckbox.checked ? reminderDateInput.value : null
+        };
+        
+        if (editingCallId) {
+          // Update existing call
+          const index = calls.findIndex(c => c.id === editingCallId);
+          if (index !== -1) {
+            calls[index] = callData;
+          }
+        } else {
+          // Add new call
+          calls.push(callData);
+        }
+        
+        // Save calls to localStorage
+        saveCalls();
+        
+        // Refresh the UI
+        renderCalls();
+        
+        // Close modal
+        closeModal();
+      });
+      
+      // Search input
+      searchInput.addEventListener('input', debounce(function() {
+        renderCalls();
+      }, 300));
+      
+      // Filter by status
+      filterStatus.addEventListener('change', function() {
+        renderCalls();
+      });
+      
+      // Initialize the application
+      function init() {
+        // Check if user is already logged in
+        const storedUser = localStorage.getItem('callflow_current_user');
+        if (storedUser) {
+          currentUser = JSON.parse(storedUser);
+          authContainer.classList.add('hidden');
+          appContainer.classList.remove('hidden');
+          
+          // Update UI with user info
+          userName.textContent = currentUser.name;
+          
+          // Load calls for the current user
+          loadCalls();
+          
+          // Initialize Sortable.js for kanban columns
+          initSortable();
+        }
+        
+        // Set the current date/time for the call date input
+        const now = new Date();
+        const formattedDate = now.toISOString().slice(0, 16);
+        callDateInput.value = formattedDate;
+      }
+      
+      // Initialize Sortable.js for kanban columns
+      function initSortable() {
+        // Clean up any existing sortable instances
+        if (sortables.length > 0) {
+          sortables.forEach(s => s.destroy());
+          sortables = [];
+        }
+        
+        const containers = [pendingCallsContainer, progressCallsContainer, completedCallsContainer];
+        
+        containers.forEach(container => {
+          const sortable = new Sortable(container, {
+            group: 'calls',
+            animation: 150,
+            ghostClass: 'ghost-card',
+            dragClass: 'dragging',
+            onEnd: function(evt) {
+              const callId = evt.item.dataset.id;
+              const newStatus = evt.to.closest('.kanban-column').dataset.status;
+              
+              // Update call status
+              const callIndex = calls.findIndex(c => c.id === callId);
+              if (callIndex !== -1) {
+                calls[callIndex].status = newStatus;
+                saveCalls();
+                updateCounters();
+              }
+            }
+          });
+          
+          sortables.push(sortable);
+        });
+      }
+      
+      // Load calls from localStorage
+      function loadCalls() {
+        if (!currentUser) return;
+        
+        const userCalls = localStorage.getItem(`callflow_calls_${currentUser.id}`);
+        calls = userCalls ? JSON.parse(userCalls) : [];
+        
+        renderCalls();
+      }
+      
+      // Save calls to localStorage
+      function saveCalls() {
+        if (!currentUser) return;
+        
+        localStorage.setItem(`callflow_calls_${currentUser.id}`, JSON.stringify(calls));
+      }
+      
+      // Render calls to UI
+      function renderCalls() {
+        // Clear containers
+        pendingCallsContainer.innerHTML = '';
+        progressCallsContainer.innerHTML = '';
+        completedCallsContainer.innerHTML = '';
+        
+        // Get search and filter values
+        const searchTerm = searchInput.value.toLowerCase();
+        const statusFilter = filterStatus.value;
+        
+        // Filter and sort calls
+        const filteredCalls = calls
+          .filter(call => {
+            // Filter by search term
+            const matchesSearch = call.name.toLowerCase().includes(searchTerm) || 
+                                 call.followup.toLowerCase().includes(searchTerm) ||
+                                 call.notes.toLowerCase().includes(searchTerm);
+            
+            // Filter by status
+            const matchesStatus = statusFilter === 'all' || call.status === statusFilter;
+            
+            return matchesSearch && matchesStatus;
+          })
+          .sort((a, b) => new Date(b.date) - new Date(a.date));
+        
+        // Render filtered calls
+        filteredCalls.forEach(call => {
+          const callCard = createCallCard(call);
+          
+          switch (call.status) {
+            case 'pending':
+              pendingCallsContainer.appendChild(callCard);
+              break;
+            case 'progress':
+              progressCallsContainer.appendChild(callCard);
+              break;
+            case 'completed':
+              completedCallsContainer.appendChild(callCard);
+              break;
+          }
+        });
+        
+        // Update counters
+        updateCounters();
+        
+        // Check for reminders
+        checkReminders();
+
+        // Check for charts....
+        updateStats();
+        renderCharts();
+      }
+      
+      // Create a call card element
+      function createCallCard(call) {
+        const card = document.createElement('div');
+        card.className = 'call-card p-3 rounded-lg shadow-md';
+        card.dataset.id = call.id;
+        
+        const formattedDate = formatDate(call.date);
+        
+        // Add status badge based on call status
+        let statusBadge = '';
+        switch (call.status) {
+          case 'pending':
+            statusBadge = '<span class="status-badge status-pending">Pendiente</span>';
+            break;
+          case 'progress':
+            statusBadge = '<span class="status-badge status-progress">En Progreso</span>';
+            break;
+          case 'completed':
+            statusBadge = '<span class="status-badge status-completed">Completada</span>';
+            break;
+        }
+        
+        // Add reminder icon if a reminder is set
+        const reminderIcon = call.reminder ? 
+          `<span class="ml-2 text-accent-primary pulse" title="Recordatorio: ${formatDate(call.reminder)}">
+            <i class="fas fa-bell"></i>
+           </span>` : '';
+        
+        card.innerHTML = `
+          <div class="flex justify-between items-start">
+            <h4 class="font-medium">${call.name}</h4>
+            <div class="flex">
+              ${reminderIcon}
+              <button class="ml-2 text-gray-400 hover:text-accent-primary edit-call" data-id="${call.id}">
+                <i class="fas fa-edit"></i>
+              </button>
+            </div>
+          </div>
+          <div class="flex items-center mt-2 mb-2">
+            ${statusBadge}
+            <span class="text-xs text-gray-400 ml-2">
+              <i class="far fa-clock mr-1"></i>${formattedDate}
+            </span>
+          </div>
+          <p class="text-xs text-gray-400 line-clamp-2">${call.followup || 'Sin seguimiento'}</p>
+        `;
+        
+        // Add click event to view call details
+        card.addEventListener('click', (e) => {
+          // If clicked on edit button, open edit modal
+          if (e.target.closest('.edit-call')) {
+            openModal(call.id);
+          } else {
+            openViewModal(call.id);
+          }
+        });
+        
+        return card;
+      }
+      
+      // Open the call modal (create or edit)
+      function openModal(callId = null) {
+        // Reset form
+        callForm.reset();
+        callIdInput.value = '';
+        editingCallId = null;
+        deleteCallBtn.classList.add('hidden');
+        reminderContainer.classList.add('hidden');
+        modalTitle.textContent = 'Nueva Llamada';
+        saveText.textContent = 'Guardar';
+        
+        const now = new Date();
+        const localDatetime = now.toISOString().slice(0, 16);
+        callDateInput.value = localDatetime;
+        
+        if (callId) {
+          // Edit existing call
+          const call = calls.find(c => c.id === callId);
+          if (call) {
+            callIdInput.value = call.id;
+            editingCallId = call.id;
+            callNameInput.value = call.name;
+            callDateInput.value = call.date;
+            callStatusInput.value = call.status;
+            callFollowupInput.value = call.followup;
+            callNotesInput.value = call.notes;
+            
+            if (call.reminder) {
+              setReminderCheckbox.checked = true;
+              reminderContainer.classList.remove('hidden');
+              reminderDateInput.value = call.reminder;
+            }
+            
+            deleteCallBtn.classList.remove('hidden');
+            modalTitle.textContent = 'Editar Llamada';
+            saveText.textContent = 'Actualizar';
+          }
+        }
+        
+        callModal.classList.remove('hidden');
+      }
+      
+      // Close the call modal
+      function closeModal() {
+        callModal.classList.add('hidden');
+        callForm.reset();
+      }
+      
+      // Open the view modal
+      function openViewModal(callId) {
+        const call = calls.find(c => c.id === callId);
+        if (!call) return;
+        
+        viewName.textContent = call.name;
+        
+        // Set status badge
+        viewStatusBadge.className = 'status-badge';
+        viewStatusBadge.classList.add(`status-${call.status}`);
+        switch (call.status) {
+          case 'pending':
+            viewStatusBadge.textContent = 'Pendiente';
+            break;
+          case 'progress':
+            viewStatusBadge.textContent = 'En Progreso';
+            break;
+          case 'completed':
+            viewStatusBadge.textContent = 'Completada';
+            break;
+        }
+        
+        viewDate.textContent = formatDate(call.date);
+        viewFollowup.textContent = call.followup || 'Sin seguimiento';
+        viewNotes.textContent = call.notes || 'Sin notas';
+        
+        // Set reminder if exists
+        if (call.reminder) {
+          viewReminder.classList.remove('hidden');
+          viewReminderDate.textContent = formatDate(call.reminder);
+        } else {
+          viewReminder.classList.add('hidden');
+        }
+        
+        // Set call ID for edit button
+        editCallBtn.dataset.callId = call.id;
+        
+        // Show modal
+        viewModal.classList.remove('hidden');
+      }
+      
+      // Close the view modal
+      function closeViewModal() {
+        viewModal.classList.add('hidden');
+      }
+      
+      // Delete a call
+      function deleteCall(callId) {
+        const index = calls.findIndex(c => c.id === callId);
+        if (index !== -1) {
+          calls.splice(index, 1);
+          saveCalls();
+          renderCalls();
+        }
+      }
+      
+      // Update counters
+      function updateCounters() {
+        pendingCount.textContent = calls.filter(c => c.status === 'pending').length;
+        progressCount.textContent = calls.filter(c => c.status === 'progress').length;
+        completedCount.textContent = calls.filter(c => c.status === 'completed').length;
+      }
+      
+      // Check for reminders
+      function checkReminders() {
+        const now = new Date();
+        
+        calls.forEach(call => {
+          if (call.reminder) {
+            const reminderTime = new Date(call.reminder);
+            
+            // Check if reminder time is in the past and within the last 5 minutes
+            const fiveMinutesAgo = new Date(now.getTime() - 5 * 60000);
+            
+            if (reminderTime > fiveMinutesAgo && reminderTime <= now) {
+              // Show notification if supported
+              if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification('Recordatorio de llamada', {
+                  body: `Llamada a: ${call.name}`,
+                  icon: 'https://cdn-icons-png.flaticon.com/512/2991/2991677.png'
+                });
+              } else {
+                // Fallback to alert
+                alert(`Recordatorio de llamada: ${call.name}`);
+              }
+              
+              // Remove the reminder
+              call.reminder = null;
+              saveCalls();
+            }
+          }
+        });
+      }
+      // Se agrego esto ------------
+      // Export/Import functions
+      document.getElementById('export-json-btn').addEventListener('click', exportToJSON);
+      document.getElementById('export-csv-btn').addEventListener('click', exportToCSV);
+      document.getElementById('import-json-btn').addEventListener('click', () => {
+        document.getElementById('import-json-file').click();
+      });
+      document.getElementById('import-json-file').addEventListener('change', importFromJSON);
+
+      function exportToJSON() {
+        const dataStr = JSON.stringify(calls, null, 2);
+        const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+        const exportName = `callflow_export_${new Date().toISOString().slice(0,10)}.json`;
+        
+        const linkElement = document.createElement('a');
+        linkElement.setAttribute('href', dataUri);
+        linkElement.setAttribute('download', exportName);
+        linkElement.click();
+      }
+
+      function exportToCSV() {
+        const headers = ['ID', 'Nombre', 'Fecha', 'Estado', 'Seguimiento', 'Notas', 'Recordatorio'];
+        const rows = calls.map(call => [
+          call.id,
+          `"${call.name.replace(/"/g, '""')}"`,
+          call.date,
+          call.status,
+          `"${(call.followup || '').replace(/"/g, '""')}"`,
+          `"${(call.notes || '').replace(/"/g, '""')}"`,
+          call.reminder || ''
+        ]);
+
+        let csvContent = headers.join(',') + '\n' + rows.map(e => e.join(',')).join('\n');
+        const exportName = `callflow_export_${new Date().toISOString().slice(0,10)}.csv`;
+        
+        const linkElement = document.createElement('a');
+        linkElement.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvContent));
+        linkElement.setAttribute('download', exportName);
+        linkElement.click();
+      }
+
+      function importFromJSON(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          try {
+            const importedCalls = JSON.parse(e.target.result);
+            if (Array.isArray(importedCalls) && importedCalls.length > 0) {
+              if (confirm(`¿Importar ${importedCalls.length} llamadas? Se fusionarán con tus datos actuales.`)) {
+                calls = [...calls, ...importedCalls];
+                saveCalls();
+                renderCalls();
+                alert('Importación completada correctamente');
+              }
+            }
+          } catch (error) {
+            alert('Error al importar: El archivo no es válido');
+          }
+          event.target.value = '';
+        };
+        reader.readAsText(file);
+      }
+      //----------------------------------------------------------
+
+      //---se agrego esto para los charts -------------
+      // Stats functions
+      function updateStats() {
+        document.getElementById('total-calls').textContent = calls.length;
+        
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        
+        document.getElementById('weekly-completed').textContent = calls.filter(call => 
+          call.status === 'completed' && new Date(call.date) >= sevenDaysAgo
+        ).length;
+        
+        const nextWeek = new Date();
+        nextWeek.setDate(nextWeek.getDate() + 7);
+        
+        document.getElementById('upcoming-calls').textContent = calls.filter(call => 
+          new Date(call.date) <= nextWeek && new Date(call.date) >= new Date()
+        ).length;
+      }
+
+      function renderCharts() {
+        // Status Chart
+        const statusCtx = document.getElementById('status-chart').getContext('2d');
+        const statusData = {
+          labels: ['Pendientes', 'En Progreso', 'Completadas'],
+          datasets: [{
+            data: [
+              calls.filter(c => c.status === 'pending').length,
+              calls.filter(c => c.status === 'progress').length,
+              calls.filter(c => c.status === 'completed').length
+            ],
+            backgroundColor: [
+              'rgba(245, 158, 11, 0.7)',
+              'rgba(59, 130, 246, 0.7)',
+              'rgba(16, 185, 129, 0.7)'
+            ],
+            borderColor: [
+              'rgba(245, 158, 11, 1)',
+              'rgba(59, 130, 246, 1)',
+              'rgba(16, 185, 129, 1)'
+            ],
+            borderWidth: 1
+          }]
+        };
+
+        if (statusChart) statusChart.destroy();
+        statusChart = new Chart(statusCtx, {
+          type: 'doughnut',
+          data: statusData,
+          options: {
+            responsive: true,
+            plugins: {
+              legend: {
+                position: 'bottom',
+                labels: {
+                  color: '#f1f5f9'
+                }
+              }
+            }
+          }
+        });
+
+        // Timeline Chart
+        const timelineCtx = document.getElementById('timeline-chart').getContext('2d');
+        const last30Days = [...Array(30)].map((_, i) => {
+          const d = new Date();
+          d.setDate(d.getDate() - i);
+          return d.toISOString().split('T')[0];
+        }).reverse();
+
+        const timelineData = {
+          labels: last30Days,
+          datasets: [{
+            label: 'Llamadas por día',
+            data: last30Days.map(date => 
+              calls.filter(call => call.date.split('T')[0] === date).length
+            ),
+            backgroundColor: 'rgba(6, 182, 212, 0.2)',
+            borderColor: 'rgba(6, 182, 212, 1)',
+            borderWidth: 1,
+            tension: 0.4,
+            fill: true
+          }]
+        };
+
+        if (timelineChart) timelineChart.destroy();
+        timelineChart = new Chart(timelineCtx, {
+          type: 'line',
+          data: timelineData,
+          options: {
+            responsive: true,
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  color: '#94a3b8'
+                },
+                grid: {
+                  color: 'rgba(148, 163, 184, 0.1)'
+                }
+              },
+              x: {
+                ticks: {
+                  color: '#94a3b8',
+                  maxRotation: 45,
+                  minRotation: 45
+                },
+                grid: {
+                  color: 'rgba(148, 163, 184, 0.1)'
+                }
+              }
+            },
+            plugins: {
+              legend: {
+                labels: {
+                  color: '#f1f5f9'
+                }
+              }
+            }
+          }
+        });
+      }
+
+      //-----------------------------------------------
+
+      // Helper Functions
+      
+      // Generate unique ID
+      function generateUniqueId() {
+        return Date.now().toString(36) + Math.random().toString(36).substring(2);
+      }
+      
+      // Format date
+      function formatDate(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleString();
+      }
+      
+      // Show error message
+      function showError(element, message) {
+        element.textContent = message;
+        element.classList.remove('hidden');
+      }
+      
+      // Show loading overlay
+      function showLoading() {
+        loadingOverlay.classList.remove('hidden');
+      }
+      
+      // Hide loading overlay
+      function hideLoading() {
+        loadingOverlay.classList.add('hidden');
+      }
+      
+      // Debounce function
+      function debounce(func, delay) {
+        let timeout;
+        return function() {
+          const context = this;
+          const args = arguments;
+          clearTimeout(timeout);
+          timeout = setTimeout(() => func.apply(context, args), delay);
+        };
+      }
+      
+      // Request notification permission
+      function requestNotificationPermission() {
+        if ('Notification' in window) {
+          Notification.requestPermission();
+        }
+      }
+      
+      // Request notification permission when app loads
+      requestNotificationPermission();
+    });
+  </script>
+  <script>
+  // Manejo del menú desplegable
+  const dataActionsBtn = document.getElementById('data-actions-btn');
+  const dataActionsMenu = document.getElementById('data-actions-menu');
+  const dataActionsContainer = document.getElementById('data-actions-container');
+
+  dataActionsBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    dataActionsMenu.classList.toggle('hidden');
+  });
+
+  // Cerrar el menú al hacer clic fuera
+  document.addEventListener('click', (e) => {
+    if (!dataActionsContainer.contains(e.target)) {
+      dataActionsMenu.classList.add('hidden');
+    }
+  });
+
+  // Cerrar el menú al seleccionar una opción
+  document.querySelectorAll('#data-actions-menu button').forEach(button => {
+    button.addEventListener('click', () => {
+      dataActionsMenu.classList.add('hidden');
+    });
+  });
+</script>
+</body>
+</html>
